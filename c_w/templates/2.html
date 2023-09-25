@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>VRP Voraz</title>
+    <!-- Agrega enlaces a Bootstrap CSS aquí -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mt-5">Resolución del Problema de Rutas de Vehículos (VRP) - Algoritmo Voraz</h1>
+        <form id="ciudad-form" class="mt-3" action="/" method="POST">
+            <div class="mb-3">
+                <label for="ciudad" class="form-label">Nombre de la Ciudad:</label>
+                <input type="text" class="form-control" id="ciudad" name="ciudad" required>
+            </div>
+            <div class="mb-3">
+                <label for="latitud" class="form-label">Latitud:</label>
+                <input type="number" step="any" class="form-control" id="latitud" name="latitud" required>
+            </div>
+            <div class="mb-3">
+                <label for="longitud" class="form-label">Longitud:</label>
+                <input type="number" step="any" class="form-control" id="longitud" name="longitud" required>
+            </div>
+            <div class="mb-3">
+                <label for="paquetes" class="form-label">Cantidad de Paquetes:</label>
+                <input type="number" class="form-control" id="paquetes" name="paquetes"required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="agregar-ciudad">Agregar Ciudad</button>
+            <!-- Agregar el botón "Generar Ruta" -->
+            <button type="submit" class="btn btn-success" id="generar-ruta">Generar Ruta</button>
+        </form>
+
+        <h2 class="mt-4">Ciudades Agregadas:</h2>
+        <div class="row" id="ciudades-list"></div>
+
+        <h2 class="mt-4">Rutas Generadas:</h2>
+        <ul id="rutas-list"></ul>
+    </div>
+
+    <script>
+        // Definir variables para almacenar las ciudades y pedidos
+        const coord = {};
+        const pedidos = {};
+        const max_carga = 40; // Define el valor de max_carga
+
+        // Función para manejar la agregación de ciudades
+        function agregarCiudad() {
+            const ciudad = document.getElementById('ciudad').value;
+            const latitud = parseFloat(document.getElementById('latitud').value);
+            const longitud = parseFloat(document.getElementById('longitud').value);
+            const paquetes = parseInt(document.getElementById('paquetes').value);
+
+            // Agregar la ciudad a la lista de ciudades y paquetes
+            coord[ciudad] = [latitud, longitud];
+            pedidos[ciudad] = paquetes;
+
+            // Crear una tarjeta (card) para mostrar los valores ingresados
+            const ciudadesList = document.getElementById('ciudades-list');
+            const ciudadCard = document.createElement('div');
+            ciudadCard.className = 'col-md-4 mt-3';
+            ciudadCard.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${ciudad}</h5>
+                        <p class="card-text">Latitud: ${latitud}</p>
+                        <p class="card-text">Longitud: ${longitud}</p>
+                        <p class="card-text">Cantidad de Paquetes: ${paquetes}</p>
+                    </div>
+                </div>
+            `;
+            ciudadesList.appendChild(ciudadCard);
+
+            // Limpiar los campos del formulario
+            document.getElementById('ciudad').value = '';
+            document.getElementById('latitud').value = '';
+            document.getElementById('longitud').value = '';
+            document.getElementById('paquetes').value = '';
+        }
+
+        // Función para mostrar las rutas
+        function mostrarRutas() {
+            // Realizar una solicitud POST al servidor Flask
+            fetch("/", {
+                method: "POST",
+                body: new FormData(document.getElementById("ciudad-form")),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Obtener las rutas desde la respuesta JSON
+                    const rutas = data.rutas;
+
+                    // Mostrar las rutas en la lista de resultados
+                    const rutasList = document.getElementById('rutas-list');
+                    rutasList.innerHTML = '';
+                    rutas.forEach((ruta, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Ruta ${index + 1}: ${ruta.join(' -> ')}`;
+                        rutasList.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al obtener las rutas:", error);
+                });
+        }
+
+        // Manejar el evento de hacer clic en el botón "Agregar Ciudad"
+        document.getElementById('agregar-ciudad').addEventListener('click', function(event) {
+            event.preventDefault(); // Evitar que el formulario se envíe automáticamente
+            agregarCiudad();
+        });
+
+        // Manejar el evento de hacer clic en el botón "Generar Ruta"
+        document.getElementById('generar-ruta').addEventListener('click', function(event) {
+            event.preventDefault(); // Evitar que el formulario se envíe automáticamente
+            mostrarRutas();
+        });
+    </script>
+    <!-- Agrega enlaces a Bootstrap JS aquí (si es necesario) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>

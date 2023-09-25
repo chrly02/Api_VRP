@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VRP Solver</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>VRP Solver</h1>
+        <h2>Add City</h2>
+        <form method="POST" action="/add_city">
+            <div class="form-group">
+                <label for="city">City Name:</label>
+                <input type="text" class="form-control" id="city" name="city" required>
+            </div>
+            <div class="form-group">
+                <label for="latitude">Latitude:</label>
+                <input type="text" class="form-control" id="latitude" name="latitude" required>
+            </div>
+            <div class="form-group">
+                <label for="longitude">Longitude:</label>
+                <input type="text" class="form-control" id="longitude" name="longitude" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add City</button>
+        </form>
+
+        <h2>City List</h2>
+        <div class="row" id="cityList"> <!-- Contenedor para las tarjetas de las ciudades -->
+            <!-- Las tarjetas de las ciudades se agregarán aquí -->
+        </div>
+    </div>
+</body>
+<script>
+    // Asignar un evento al formulario para enviar los datos sin recargar la página
+    document.querySelector('form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Evita la recarga de la página
+        const formData = new FormData(this);
+
+        fetch('/add_city', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Crear una nueva tarjeta con los datos del formulario
+                const cityList = document.querySelector('#cityList');
+                const cityCard = document.createElement('div');
+                cityCard.className = 'col-md-4 mb-4';
+                cityCard.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${data.city}</h5>
+                            <p class="card-text">Latitude: ${data.latitude}</p>
+                            <p class="card-text">Longitude: ${data.longitude}</p>
+                        </div>
+                    </div>
+                `;
+                cityList.appendChild(cityCard);
+                document.querySelector('form').reset(); // Limpia el formulario después de agregar una ciudad
+            });
+    });
+</script>
+</html>

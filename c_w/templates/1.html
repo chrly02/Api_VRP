@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>VRP Voraz</title>
+</head>
+
+<body>
+    <h1>Resolución del Problema de Rutas de Vehículos (VRP) - Algoritmo Voraz</h1>
+    <form id="ciudad-form">
+        <label for="ciudad">Nombre de la Ciudad:</label>
+        <input type="text" id="ciudad" required>
+        <br>
+        <label for="latitud">Latitud:</label>
+        <input type="number" step="any" id="latitud" required>
+        <br>
+        <label for="longitud">Longitud:</label>
+        <input type="number" step="any" id="longitud" required>
+        <br>
+        <label for="paquetes">Cantidad de Paquetes:</label>
+        <input type="number" id="paquetes" required>
+        <br>
+        <button type="button" id="agregar-ciudad">Agregar Ciudad</button>
+    </form>
+
+    <h2>Rutas Generadas:</h2>
+    <ul id="rutas-list"></ul>
+
+    <script>
+        // Importar funciones y constantes necesarias aquí
+
+        // Función para manejar la agregación de ciudades
+        function agregarCiudad() {
+            const ciudad = document.getElementById('ciudad').value;
+            const latitud = parseFloat(document.getElementById('latitud').value);
+            const longitud = parseFloat(document.getElementById('longitud').value);
+            const paquetes = parseInt(document.getElementById('paquetes').value);
+
+            // Agregar la ciudad a la lista de ciudades y paquetes
+            coord[ciudad] = [latitud, longitud];
+            pedidos[ciudad] = paquetes;
+
+            // Limpiar los campos del formulario
+            document.getElementById('ciudad').value = '';
+            document.getElementById('latitud').value = '';
+            document.getElementById('longitud').value = '';
+            document.getElementById('paquetes').value = '';
+
+            // Llamar a la función para mostrar las rutas
+            mostrarRutas();
+        }
+
+        // Función para mostrar las rutas
+        function mostrarRutas() {
+            // Llamar a la función vrp_voraz con los datos ingresados
+            const rutas = vrp_voraz(coord, pedidos, max_carga);
+
+            // Mostrar las rutas en la lista de resultados
+            const rutasList = document.getElementById('rutas-list');
+            rutasList.innerHTML = '';
+            rutas.forEach((ruta, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Ruta ${index + 1}: ${ruta.join(' -> ')}`;
+                rutasList.appendChild(listItem);
+            });
+        }
+
+        // Manejar el evento de hacer clic en el botón "Agregar Ciudad"
+        document.getElementById('agregar-ciudad').addEventListener('click', agregarCiudad);
+
+        // Llamar a la función para mostrar las rutas inicialmente
+        mostrarRutas();
+
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
